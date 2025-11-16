@@ -14,11 +14,7 @@ builder.Services.AddSingleton(_ =>
 });
 
 // Register MCP server and tools
-builder.Services.AddMcpServer()
-    .WithStdioServerTransport()
-    .WithToolsFromAssembly()
-    .WithResourcesFromAssembly()
-    .WithPromptsFromAssembly();
+
     
 var app = builder.Build();
 
