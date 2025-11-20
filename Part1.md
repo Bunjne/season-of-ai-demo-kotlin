@@ -75,7 +75,15 @@ public static async Task<string> GetForecast(
 - `Description` attributes - Provide context to the AI about what the tool does
 - The `WeatherForecastService` parameter is automatically injected by dependency injection
 
-## Step 2.1: Configure the MCP Server in VS Code
+## Step 2.1: Build the Project
+
+Build the WeatherMCP project to ensure everything compiles correctly:
+
+```bash
+dotnet build WeatherMCP/WeatherMCP.csproj
+```
+
+## Step 2.2: Configure the MCP Server in VS Code
 
 To use your MCP server with GitHub Copilot in VS Code, you need to configure it in the MCP settings file.
 
@@ -85,13 +93,14 @@ To use your MCP server with GitHub Copilot in VS Code, you need to configure it 
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "WeatherMCP": {
       "command": "dotnet",
       "args": [
         "run",
         "--project",
-        "WeatherMCP/WeatherMCP.csproj"
+        "WeatherMCP/WeatherMCP.csproj",
+        "--no-build"
       ]
     }
   }
@@ -102,8 +111,9 @@ To use your MCP server with GitHub Copilot in VS Code, you need to configure it 
 - Defines an MCP server named "WeatherMCP"
 - Configures VS Code to run your server using `dotnet run`
 - Points to your WeatherMCP project
+- Uses `--no-build` to skip rebuilding (since you already built in Step 2.1)
 
-## Step 2.2: Test Your Tools with GitHub Copilot
+## Step 2.3: Test Your Tools with GitHub Copilot
 
 Now let's test that your tools are working!
 
