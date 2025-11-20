@@ -10,12 +10,7 @@ In this workshop, you'll build an MCP server for a project allocation system. Wh
 
 ## Demo Video
 
-Watch this preview to see the Project Allocation Manager MCP in action:
-
-<video width="640" height="480" controls>
-  <source src="allocation-mcp-preview.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+[Watch this preview to see the Project Allocation Manager MCP in action](allocation-mcp-preview.mp4)
 
 ## Overview
 
