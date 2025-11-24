@@ -15,9 +15,9 @@ In this workshop, you'll build an MCP server for a project allocation system. Wh
 ## Overview
 
 **What's already provided:**
-- `AllocationService` - Complete service with all business logic, validation and XML documentation
+- `AllocationService` - Complete service with all business logic, validation and KDoc documentation
 - `Allocation`, `Engineer`, and `Project` models
-- Sample data in JSON files
+- Sample data in JSON files in `src/main/resources/asset/`
 - Basic tool implementations: `ListEngineersTool`, `ListProjectsTool`
 
 **What you'll build:**
@@ -30,39 +30,37 @@ In this workshop, you'll build an MCP server for a project allocation system. Wh
 
 ### Step 1: Understand the Existing Code
 
-1. **Review the models** in `ProjectAllocationManagerMCP/Models/`
-2. **Check the sample data** in `ProjectAllocationManagerMCP/data/`
-3. **Study the service** in `ProjectAllocationManagerMCP/Services/AllocationService.cs`
-   - Read the XML documentation on each method
+1. **Review the models** in `Kotlin/ProjectAllocationManagerMCP/src/main/kotlin/io/modelcontextprotocol/allocation/models/`
+2. **Check the sample data** in `Kotlin/ProjectAllocationManagerMCP/src/main/resources/asset/`
+3. **Study the service** in `Kotlin/ProjectAllocationManagerMCP/src/main/kotlin/io/modelcontextprotocol/allocation/services/AllocationService.kt`
+   - Read the KDoc documentation on each method
    - Understand the available methods you can use
-4. **Examine existing tools** in `ProjectAllocationManagerMCP/Tools/`
+4. **Examine existing tools** in `Kotlin/ProjectAllocationManagerMCP/src/main/kotlin/io/modelcontextprotocol/allocation/tools/`
 
 ### Step 2: Build the project
 
 Build the ProjectAllocationManagerMCP project to ensure everything compiles correctly:
 
 ```bash
-dotnet build ProjectAllocationManagerMCP/ProjectAllocationManagerMCP.csproj
+cd Kotlin/ProjectAllocationManagerMCP
+./gradlew build
 ```
 
 ### Step 3: Configure MCP Server
 
-To use your MCP server with GitHub Copilot in VS Code, configure it in the MCP settings file:
+To use your MCP server with AI assistants, configure it in the MCP settings file:
 
-1. Create a `.vscode` folder in your project root if it doesn't exist
-2. Create a file named `mcp.json` inside the `.vscode` folder
-3. Add the following configuration:
+1. Locate your MCP config file (usually at `~/.codeium/windsurf/mcp_config.json` or similar)
+2. Add the following configuration:
 
 ```json
 {
   "mcpServers": {
-    "ProjectAllocationManagerMCP": {
-      "command": "dotnet",
+    "project-allocation-manager": {
+      "command": "java",
       "args": [
-        "run",
-        "--project",
-        "ProjectAllocationManagerMCP/ProjectAllocationManagerMCP.csproj",
-        "--no-build"
+        "-jar",
+        "/path/to/SeasonOfAIDemo/Kotlin/ProjectAllocationManagerMCP/build/libs/ProjectAllocationManagerMCP-all.jar"
       ]
     }
   }
@@ -70,10 +68,10 @@ To use your MCP server with GitHub Copilot in VS Code, configure it in the MCP s
 ```
 
 **What this does:**
-- Defines an MCP server named "ProjectAllocationManagerMCP"
-- Configures VS Code to run your server using `dotnet run`
-- Points to your ProjectAllocationManagerMCP project
-- Uses `--no-build` to skip rebuilding (since you already built in Step 2)
+- Defines an MCP server named "project-allocation-manager"
+- Configures the IDE to run your server using the built JAR file
+- Points to your ProjectAllocationManagerMCP fat JAR
+- Replace `/path/to/` with your actual project path
 
 ### Step 4: Test Existing Tools
 
@@ -84,44 +82,83 @@ Test the provided tools :
 ## Exercise Time 🚀
 
 ### Task 1: Create tool to retrieve all allocations
-**Service method to use:** `GetAllocationsAsync()`
+**Service method to use:** `getAllocations()`
+
+**Example tool structure:**
+```kotlin
+class GetAllocationsTool(private val allocationService: AllocationService) {
+    suspend fun execute(): List<Allocation> {
+        return allocationService.getAllocations()
+    }
+}
+```
 
 ### Task 2: Create tool to retrieve engineers by id
-**Service method to use:** `GetEngineerByIdAsync(string id)`
+**Service method to use:** `getEngineerById(id: String)`
 
 ### Task 3: Create tool to retrieve projects by id
-**Service method to use:** `GetProjectByIdAsync(string id)`
+**Service method to use:** `getProjectById(id: String)`
 
 ### Task 4: Create tool to retrieve allocations by id
-**Service method to use:** `GetAllocationByIdAsync(string id)`
+**Service method to use:** `getAllocationById(id: String)`
 
 ### Task 5: Create tool to allocate an engineer
-**Service method to use:** `AllocateEngineerAsync(string engineerId, string projectId, int allocationPercentage, string? startDate = null, string? endDate = null)`
+**Service method to use:** `allocateEngineer(engineerId: String, projectId: String, allocationPercentage: Int, startDate: String? = null, endDate: String? = null)`
 
 ### Task 6: Create tool to update allocation of an engineer
-**Service method to use:** `UpdateAllocationAsync(string allocationId, int? allocationPercentage = null, string? startDate = null, string? endDate = null)`
+**Service method to use:** `updateAllocation(allocationId: String, allocationPercentage: Int? = null, startDate: String? = null, endDate: String? = null)`
 
 ### Task 7: Add Reference Data Resources
 
 Create resources that provide reference data to AI assistants:
 
 **File to create:**
-- `Resources/AllocationResources.cs`
+- `Kotlin/ProjectAllocationManagerMCP/src/main/kotlin/io/modelcontextprotocol/allocation/resources/AllocationResources.kt`
 
 **Resources to implement:**
 1. `allocation://engineers` - List all engineers with details
 2. `allocation://projects` - List all projects with details
+
+**Example resource structure:**
+```kotlin
+val engineersResource = Resource(
+    uri = "allocation://engineers",
+    name = "Engineers List",
+    description = "List of all engineers with their skills",
+    mimeType = "application/json"
+)
+```
 
 ### Task 8: Add Workflow Prompts
 
 Create prompts that guide users through common tasks:
 
 **File to create:**
-- `Prompts/AllocationPrompts.cs`
+- `Kotlin/ProjectAllocationManagerMCP/src/main/kotlin/io/modelcontextprotocol/allocation/prompts/AllocationPrompts.kt`
 
 **Prompts to implement:**
 1. **AllocateEngineerPrompt** - Guide users to allocate an engineer accepting name, project and start and end date
 2. **MoveEngineerToBenchPrompt** - Guide users to move an engineer to the bench (unallocate from current projects)
+
+**Example prompt structure:**
+```kotlin
+val allocateEngineerPrompt = Prompt(
+    name = "AllocateEngineer",
+    description = "Guide to allocate an engineer to a project",
+    arguments = listOf(
+        Prompt.Argument(
+            name = "engineerName",
+            description = "Name of the engineer",
+            required = true
+        ),
+        Prompt.Argument(
+            name = "projectName",
+            description = "Name of the project",
+            required = true
+        )
+    )
+)
+```
 
 ## Summary
 

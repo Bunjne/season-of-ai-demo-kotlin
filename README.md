@@ -33,17 +33,18 @@ The service layer is already built—you'll focus on creating the MCP interface.
 
 ## Prerequisites
 
-- .NET 9.0 SDK or later
-- Visual Studio Code with GitHub Copilot
-- Basic C# knowledge
+- JDK 11 or later
+- Gradle (included via wrapper)
+- IDE with AI assistant support (Windsurf, VS Code, etc.)
+- Basic Kotlin knowledge
 - Git (for cloning this repository)
 
 ## Getting Started
 
 1. **Clone this repository:**
    ```bash
-   git clone https://github.com/seble-nigussie/SeasonOfAIDemo
-   cd SeasonOfAIDemo
+   git clone https://github.com/Bunjne/season-of-ai-demo-kotlin.git
+   cd season-of-ai-demo-kotlin
    ```
 
 2. **Complete Part 1 first** - It's essential to understand the fundamentals before moving to Part 2
@@ -59,24 +60,27 @@ The service layer is already built—you'll focus on creating the MCP interface.
 
 ## Projects Overview
 
-### WeatherMCP
+### WeatherMCPStdioServer (Kotlin)
 A complete MCP server demonstrating integration with a public REST API (National Weather Service). Features:
 - Weather forecasts by coordinates
 - State-level weather alerts
 - Pre-configured city data
 - Quick-access prompts for major cities
+- Built with Kotlin MCP SDK
 
-### ProjectAllocationManagerMCP
+### ProjectAllocationManagerMCP (Kotlin)
 An MCP server for managing engineer project allocations. Features:
 - Complete business logic with validation
 - Over-allocation prevention
 - Date range handling
 - Extensible tool architecture
+- Kotlin coroutines for async operations
 
 ## Support
 
 If you encounter any issues or have questions during the workshop, please:
-- Review the XML documentation in the service classes
+- Review the KDoc documentation in the service classes
+- Check the Gradle build output for compilation errors
 - Ask your workshop facilitator
 
 ## What's Next?
