@@ -1,6 +1,7 @@
 package io.modelcontextprotocol.allocation
 
 import io.ktor.utils.io.streams.asInput
+import io.modelcontextprotocol.allocation.services.AllocationLocalService
 import io.modelcontextprotocol.allocation.services.AllocationService
 import io.modelcontextprotocol.allocation.tools.AllocateEngineerTool
 import io.modelcontextprotocol.allocation.tools.GetAllocationByIdTool
@@ -26,7 +27,7 @@ import kotlinx.serialization.json.Json
  */
 suspend fun runMcpServer() {
     // Create the allocation service
-    val allocationService = AllocationService()
+    val allocationService: AllocationService = AllocationLocalService()
 
     // Load data from JSON files
     allocationService.loadDataAsync()

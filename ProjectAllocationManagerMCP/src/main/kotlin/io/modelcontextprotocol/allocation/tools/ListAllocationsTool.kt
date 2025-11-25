@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import java.time.LocalDate
@@ -17,14 +16,15 @@ class ListAllocationsTool(
     private val allocationService: AllocationService,
     private val json: Json,
 ) : McpTool {
-    override fun getToolDefinition(): Triple<String, String, Tool.Input> =
-        Triple(
-            "list_allocations",
-            "List all active allocations in the system (allocations that are currently ongoing)",
-            Tool.Input(
-                properties = buildJsonObject {},
-                required = emptyList(),
-            ),
+    override fun getToolDefinition() =
+        ToolDefinition(
+            name = "list_allocations",
+            description = "List all active allocations in the system (allocations that are currently ongoing)",
+            inputSchema =
+                Tool.Input(
+                    properties = buildJsonObject {},
+                    required = emptyList(),
+                ),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {

@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -16,26 +15,27 @@ class GetEngineerByIdTool(
     private val allocationService: AllocationService,
     private val json: Json,
 ) : McpTool {
-    override fun getToolDefinition(): Triple<String, String, Tool.Input> =
-        Triple(
-            "get_engineer_by_id",
-            "Get an engineer by their unique identifier",
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        put(
-                            "engineerId",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "The unique identifier of the engineer",
-                                )
-                            },
-                        )
-                    },
-                required = listOf("engineerId"),
-            ),
+    override fun getToolDefinition() =
+        ToolDefinition(
+            name = "get_engineer_by_id",
+            description = "Get an engineer by their unique identifier",
+            inputSchema =
+                Tool.Input(
+                    properties =
+                        buildJsonObject {
+                            put(
+                                "engineerId",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "The unique identifier of the engineer",
+                                    )
+                                },
+                            )
+                        },
+                    required = listOf("engineerId"),
+                ),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {
@@ -62,9 +62,9 @@ class GetEngineerByIdTool(
                 content =
                     listOf(
                         TextContent(
-                            json.encodeToString(
-                                mapOf("error" to "Engineer not found"),
-                            ),
+                            buildJsonObject {
+                                put("error", "Engineer not found")
+                            }.toString(),
                         ),
                     ),
                 isError = true,

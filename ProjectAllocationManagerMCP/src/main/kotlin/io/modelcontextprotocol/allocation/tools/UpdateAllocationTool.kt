@@ -5,8 +5,8 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -19,56 +19,59 @@ class UpdateAllocationTool(
     private val allocationService: AllocationService,
     private val json: Json,
 ) : McpTool {
-    override fun getToolDefinition(): Triple<String, String, Tool.Input> =
-        Triple(
-            "update_allocation",
-            "Update an existing allocation with new percentage and/or date range. All parameters except allocationId are optional.",
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        put(
-                            "allocationId",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "The unique identifier of the allocation to update",
-                                )
-                            },
-                        )
-                        put(
-                            "allocationPercentage",
-                            buildJsonObject {
-                                put("type", "integer")
-                                put(
-                                    "description",
-                                    "Optional new allocation percentage (1-100). Leave empty to keep existing value.",
-                                )
-                            },
-                        )
-                        put(
-                            "startDate",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "Optional new start date in YYYY-MM-DD format. Leave empty to keep existing value.",
-                                )
-                            },
-                        )
-                        put(
-                            "endDate",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "Optional new end date in YYYY-MM-DD format. Leave empty to keep existing value.",
-                                )
-                            },
-                        )
-                    },
-                required = listOf("allocationId"),
-            ),
+    override fun getToolDefinition() =
+        ToolDefinition(
+            name = "update_allocation",
+            description =
+                "Update an existing allocation with new percentage and/or date range. " +
+                    "All parameters except allocationId are optional.",
+            inputSchema =
+                Tool.Input(
+                    properties =
+                        buildJsonObject {
+                            put(
+                                "allocationId",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "The unique identifier of the allocation to update",
+                                    )
+                                },
+                            )
+                            put(
+                                "allocationPercentage",
+                                buildJsonObject {
+                                    put("type", "integer")
+                                    put(
+                                        "description",
+                                        "Optional new allocation percentage (1-100). Leave empty to keep existing value.",
+                                    )
+                                },
+                            )
+                            put(
+                                "startDate",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "Optional new start date in YYYY-MM-DD format. Leave empty to keep existing value.",
+                                    )
+                                },
+                            )
+                            put(
+                                "endDate",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "Optional new end date in YYYY-MM-DD format. Leave empty to keep existing value.",
+                                    )
+                                },
+                            )
+                        },
+                    required = listOf("allocationId"),
+                ),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {
@@ -81,13 +84,10 @@ class UpdateAllocationTool(
                     content =
                         listOf(
                             TextContent(
-                                json.encodeToString(
-                                    mapOf(
-                                        "success" to false,
-                                        "message" to
-                                            "Missing required parameter: allocationId",
-                                    ),
-                                ),
+                                buildJsonObject {
+                                    put("success", false)
+                                    put("message", "Missing required parameter: allocationId")
+                                }.toString(),
                             ),
                         ),
                     isError = true,
@@ -109,22 +109,33 @@ class UpdateAllocationTool(
             )
 
         // Build response
-        val response =
-            if (result.success) {
-                mapOf(
-                    "success" to true,
-                    "message" to result.message,
-                    "allocation" to result.allocation,
-                )
-            } else {
-                mapOf(
-                    "success" to false,
-                    "message" to result.message,
-                )
+        val responseJson =
+            buildJsonObject {
+                put("success", result.success)
+                put("message", result.message)
+                if (result.success && result.allocation != null) {
+                    put(
+                        "allocation",
+                        JsonObject(
+                            mapOf(
+                                "id" to kotlinx.serialization.json.JsonPrimitive(result.allocation.id),
+                                "engineerId" to kotlinx.serialization.json.JsonPrimitive(result.allocation.engineerId),
+                                "projectId" to kotlinx.serialization.json.JsonPrimitive(result.allocation.projectId),
+                                "allocationPercentage" to kotlinx.serialization.json.JsonPrimitive(result.allocation.allocationPercentage),
+                                "startDate" to kotlinx.serialization.json.JsonPrimitive(result.allocation.startDate),
+                                "endDate" to
+                                    (
+                                        result.allocation.endDate?.let { kotlinx.serialization.json.JsonPrimitive(it) }
+                                            ?: kotlinx.serialization.json.JsonNull
+                                    ),
+                            ),
+                        ),
+                    )
+                }
             }
 
         return CallToolResult(
-            content = listOf(TextContent(json.encodeToString(response))),
+            content = listOf(TextContent(responseJson.toString())),
             isError = !result.success,
         )
     }

@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -16,26 +15,27 @@ class GetProjectByIdTool(
     private val allocationService: AllocationService,
     private val json: Json,
 ) : McpTool {
-    override fun getToolDefinition(): Triple<String, String, Tool.Input> =
-        Triple(
-            "get_project_by_id",
-            "Get a project by its unique identifier",
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        put(
-                            "projectId",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "The unique identifier of the project",
-                                )
-                            },
-                        )
-                    },
-                required = listOf("projectId"),
-            ),
+    override fun getToolDefinition() =
+        ToolDefinition(
+            name = "get_project_by_id",
+            description = "Get a project by its unique identifier",
+            inputSchema =
+                Tool.Input(
+                    properties =
+                        buildJsonObject {
+                            put(
+                                "projectId",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "The unique identifier of the project",
+                                    )
+                                },
+                            )
+                        },
+                    required = listOf("projectId"),
+                ),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {
@@ -60,9 +60,9 @@ class GetProjectByIdTool(
                 content =
                     listOf(
                         TextContent(
-                            json.encodeToString(
-                                mapOf("error" to "Project not found"),
-                            ),
+                            buildJsonObject {
+                                put("error", "Project not found")
+                            }.toString(),
                         ),
                     ),
                 isError = true,

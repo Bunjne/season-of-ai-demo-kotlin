@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -16,26 +15,27 @@ class GetAllocationByIdTool(
     private val allocationService: AllocationService,
     private val json: Json,
 ) : McpTool {
-    override fun getToolDefinition(): Triple<String, String, Tool.Input> =
-        Triple(
-            "get_allocation_by_id",
-            "Get an allocation by its unique identifier",
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        put(
-                            "allocationId",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "The unique identifier of the allocation",
-                                )
-                            },
-                        )
-                    },
-                required = listOf("allocationId"),
-            ),
+    override fun getToolDefinition() =
+        ToolDefinition(
+            name = "get_allocation_by_id",
+            description = "Get an allocation by its unique identifier",
+            inputSchema =
+                Tool.Input(
+                    properties =
+                        buildJsonObject {
+                            put(
+                                "allocationId",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "The unique identifier of the allocation",
+                                    )
+                                },
+                            )
+                        },
+                    required = listOf("allocationId"),
+                ),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {
@@ -62,9 +62,9 @@ class GetAllocationByIdTool(
                 content =
                     listOf(
                         TextContent(
-                            json.encodeToString(
-                                mapOf("error" to "Allocation not found"),
-                            ),
+                            buildJsonObject {
+                                put("error", "Allocation not found")
+                            }.toString(),
                         ),
                     ),
                 isError = true,
