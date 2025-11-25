@@ -2,8 +2,14 @@ package io.modelcontextprotocol.allocation
 
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.allocation.services.AllocationService
+import io.modelcontextprotocol.allocation.tools.AllocateEngineerTool
+import io.modelcontextprotocol.allocation.tools.GetAllocationByIdTool
+import io.modelcontextprotocol.allocation.tools.GetEngineerByIdTool
+import io.modelcontextprotocol.allocation.tools.GetProjectByIdTool
+import io.modelcontextprotocol.allocation.tools.ListAllocationsTool
 import io.modelcontextprotocol.allocation.tools.ListEngineersTool
 import io.modelcontextprotocol.allocation.tools.ListProjectsTool
+import io.modelcontextprotocol.allocation.tools.UpdateAllocationTool
 import io.modelcontextprotocol.kotlin.sdk.Implementation
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.server.Server
@@ -53,11 +59,23 @@ suspend fun runMcpServer() {
     // Initialize all tools
     val listEngineersTool = ListEngineersTool(allocationService, json)
     val listProjectsTool = ListProjectsTool(allocationService, json)
+    val listAllocationsTool = ListAllocationsTool(allocationService, json)
+    val allocateEngineerTool = AllocateEngineerTool(allocationService, json)
+    val updateAllocationTool = UpdateAllocationTool(allocationService, json)
+    val getEngineerByIdTool = GetEngineerByIdTool(allocationService, json)
+    val getProjectByIdTool = GetProjectByIdTool(allocationService, json)
+    val getAllocationByIdTool = GetAllocationByIdTool(allocationService, json)
 
     // Register all tools
     listOf(
         listEngineersTool,
         listProjectsTool,
+        listAllocationsTool,
+        allocateEngineerTool,
+        updateAllocationTool,
+        getEngineerByIdTool,
+        getProjectByIdTool,
+        getAllocationByIdTool,
     ).forEach { tool ->
         val definition = tool.getToolDefinition()
         server.addTool(
