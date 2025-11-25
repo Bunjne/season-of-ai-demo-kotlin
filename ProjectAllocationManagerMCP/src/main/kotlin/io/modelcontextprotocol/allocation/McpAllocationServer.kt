@@ -10,7 +10,6 @@ import io.modelcontextprotocol.kotlin.sdk.server.Server
 import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
 import io.modelcontextprotocol.kotlin.sdk.server.StdioServerTransport
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSink
 import kotlinx.io.buffered
 import kotlinx.serialization.json.Json
@@ -19,12 +18,12 @@ import kotlinx.serialization.json.Json
  * Starts an MCP server that provides project allocation management tools. Supports listing
  * engineers, projects, allocations, and managing allocations.
  */
-fun runMcpServer() {
+suspend fun runMcpServer() {
     // Create the allocation service
     val allocationService = AllocationService()
 
     // Load data from JSON files
-    runBlocking { allocationService.loadDataAsync() }
+    allocationService.loadDataAsync()
 
     val json =
         Json {
@@ -60,11 +59,11 @@ fun runMcpServer() {
         listEngineersTool,
         listProjectsTool,
     ).forEach { tool ->
-        val (name, description, inputSchema) = tool.getToolDefinition()
+        val definition = tool.getToolDefinition()
         server.addTool(
-            name = name,
-            description = description,
-            inputSchema = inputSchema,
+            name = definition.name,
+            description = definition.description,
+            inputSchema = definition.inputSchema,
         ) { request -> tool.execute(request) }
     }
 
@@ -74,11 +73,8 @@ fun runMcpServer() {
             System.`in`.asInput(),
             System.out.asSink().buffered(),
         )
-
-    runBlocking {
-        val session = server.connect(transport)
-        val done = Job()
-        session.onClose { done.complete() }
-        done.join()
-    }
+    val session = server.connect(transport)
+    val done = Job()
+    session.onClose { done.complete() }
+    done.join()
 }

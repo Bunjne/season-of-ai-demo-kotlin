@@ -1,3 +1,5 @@
 package io.modelcontextprotocol.allocation
 
-fun main() = runMcpServer()
+import kotlinx.coroutines.runBlocking
+
+fun main() = runBlocking { runMcpServer() }
