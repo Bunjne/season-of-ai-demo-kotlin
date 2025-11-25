@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -28,8 +27,8 @@ class ListAllocationsTool(
             ),
         )
 
-    override fun execute(request: CallToolRequest): CallToolResult {
-        val allAllocations = runBlocking { allocationService.getAllocationsAsync() }
+    override suspend fun execute(request: CallToolRequest): CallToolResult {
+        val allAllocations = allocationService.getAllocationsAsync()
         val today = LocalDate.now()
 
         // Filter to only active allocations (where today is between start and end dates)

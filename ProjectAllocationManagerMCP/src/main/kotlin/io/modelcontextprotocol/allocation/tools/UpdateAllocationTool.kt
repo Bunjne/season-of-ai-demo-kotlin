@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -72,7 +71,7 @@ class UpdateAllocationTool(
             ),
         )
 
-    override fun execute(request: CallToolRequest): CallToolResult {
+    override suspend fun execute(request: CallToolRequest): CallToolResult {
         val arguments = request.arguments
 
         // Extract required parameter
@@ -102,14 +101,12 @@ class UpdateAllocationTool(
 
         // Call the service to update the allocation
         val result =
-            runBlocking {
-                allocationService.updateAllocationAsync(
-                    allocationId = allocationId,
-                    allocationPercentage = allocationPercentage,
-                    startDate = startDate,
-                    endDate = endDate,
-                )
-            }
+            allocationService.updateAllocationAsync(
+                allocationId = allocationId,
+                allocationPercentage = allocationPercentage,
+                startDate = startDate,
+                endDate = endDate,
+            )
 
         // Build response
         val response =

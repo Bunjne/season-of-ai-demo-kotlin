@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -39,7 +38,7 @@ class GetEngineerByIdTool(
             ),
         )
 
-    override fun execute(request: CallToolRequest): CallToolResult {
+    override suspend fun execute(request: CallToolRequest): CallToolResult {
         val arguments = request.arguments
 
         val engineerId =
@@ -54,7 +53,7 @@ class GetEngineerByIdTool(
                     isError = true,
                 )
 
-        val engineer = runBlocking { allocationService.getEngineerByIdAsync(engineerId) }
+        val engineer = allocationService.getEngineerByIdAsync(engineerId)
 
         return if (engineer != null) {
             CallToolResult(content = listOf(TextContent(json.encodeToString(engineer))))

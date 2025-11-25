@@ -11,6 +11,7 @@ data class ToolDefinition(
 )
 
 interface McpTool {
+    fun getToolDefinition(): Triple<String, String, Tool.Input>
     fun getToolDefinition(): ToolDefinition
 
     suspend fun execute(request: CallToolRequest): CallToolResult

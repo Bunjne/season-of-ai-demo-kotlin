@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -80,7 +79,7 @@ class AllocateEngineerTool(
             ),
         )
 
-    override fun execute(request: CallToolRequest): CallToolResult {
+    override suspend fun execute(request: CallToolRequest): CallToolResult {
         val arguments = request.arguments
 
         // Extract required parameters
@@ -144,15 +143,13 @@ class AllocateEngineerTool(
 
         // Call the service to allocate the engineer
         val result =
-            runBlocking {
-                allocationService.allocateEngineerAsync(
-                    engineerId = engineerId,
-                    projectId = projectId,
-                    allocationPercentage = allocationPercentage,
-                    startDate = startDate,
-                    endDate = endDate,
-                )
-            }
+            allocationService.allocateEngineerAsync(
+                engineerId = engineerId,
+                projectId = projectId,
+                allocationPercentage = allocationPercentage,
+                startDate = startDate,
+                endDate = endDate,
+            )
 
         // Build response
         val response =

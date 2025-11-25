@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -39,7 +38,7 @@ class GetProjectByIdTool(
             ),
         )
 
-    override fun execute(request: CallToolRequest): CallToolResult {
+    override suspend fun execute(request: CallToolRequest): CallToolResult {
         val arguments = request.arguments
 
         val projectId =
@@ -52,7 +51,7 @@ class GetProjectByIdTool(
                     isError = true,
                 )
 
-        val project = runBlocking { allocationService.getProjectByIdAsync(projectId) }
+        val project = allocationService.getProjectByIdAsync(projectId)
 
         return if (project != null) {
             CallToolResult(content = listOf(TextContent(json.encodeToString(project))))
