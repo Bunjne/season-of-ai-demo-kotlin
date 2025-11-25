@@ -9,12 +9,7 @@ import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.utils.io.streams.asInput
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.GetPromptResult
 import io.modelcontextprotocol.kotlin.sdk.Implementation
-import io.modelcontextprotocol.kotlin.sdk.ListPromptsResult
-import io.modelcontextprotocol.kotlin.sdk.Prompt
-import io.modelcontextprotocol.kotlin.sdk.PromptMessage
-import io.modelcontextprotocol.kotlin.sdk.Role
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
@@ -33,7 +28,8 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 
 /**
- * Starts an MCP server that provides weather-related tools for fetching active weather alerts by state and weather forecasts by latitude/longitude.
+ * Starts an MCP server that provides weather-related tools for fetching active weather alerts by
+ * state and weather forecasts by latitude/longitude.
  */
 fun runMcpServer() {
     // Base URL for the Weather API
@@ -61,35 +57,48 @@ fun runMcpServer() {
     }
 
     // Create the MCP Server instance with a basic implementation
-    val server = Server(
-        Implementation(
-            name = "weather", // Tool name is "weather"
-            version = "1.0.0", // Version of the implementation
-        ),
-        ServerOptions(
-            capabilities = ServerCapabilities(tools = ServerCapabilities.Tools(listChanged = true)),
-        ),
-    )
+    val server =
+        Server(
+            Implementation(
+                name = "weather", // Tool name is "weather"
+                version = "1.0.0", // Version of the implementation
+            ),
+            ServerOptions(
+                capabilities =
+                    ServerCapabilities(
+                        tools = ServerCapabilities.Tools(listChanged = true),
+                        logging = null
+                    ),
+            ),
+        )
 
     // Register a tool to fetch weather alerts by state
     server.addTool(
         name = "get_alerts",
-        description = """
+        description =
+            """
             Get weather alerts for a US state. Input is Two-letter US state code (e.g. CA, NY)
         """.trimIndent(),
-        inputSchema = Tool.Input(
-            properties = buildJsonObject {
-                putJsonObject("state") {
-                    put("type", "string")
-                    put("description", "Two-letter US state code (e.g. CA, NY)")
-                }
-            },
-            required = listOf("state"),
-        ),
+        inputSchema =
+            Tool.Input(
+                properties =
+                    buildJsonObject {
+                        putJsonObject("state") {
+                            put("type", "string")
+                            put(
+                                "description",
+                                "Two-letter US state code (e.g. CA, NY)"
+                            )
+                        }
+                    },
+                required = listOf("state"),
+            ),
     ) { request ->
-        val state = request.arguments["state"]?.jsonPrimitive?.content ?: return@addTool CallToolResult(
-            content = listOf(TextContent("The 'state' parameter is required.")),
-        )
+        val state =
+            request.arguments["state"]?.jsonPrimitive?.content
+                ?: return@addTool CallToolResult(
+                    content = listOf(TextContent("The 'state' parameter is required.")),
+                )
 
         val alerts = httpClient.getAlerts(state)
 
@@ -99,26 +108,30 @@ fun runMcpServer() {
     // Register a tool to fetch weather forecast by latitude and longitude
     server.addTool(
         name = "get_forecast",
-        description = """
+        description =
+            """
             Get weather forecast for a specific latitude/longitude
         """.trimIndent(),
-        inputSchema = Tool.Input(
-            properties = buildJsonObject {
-                putJsonObject("latitude") {
-                    put("type", "number")
-                }
-                putJsonObject("longitude") {
-                    put("type", "number")
-                }
-            },
-            required = listOf("latitude", "longitude"),
-        ),
+        inputSchema =
+            Tool.Input(
+                properties =
+                    buildJsonObject {
+                        putJsonObject("latitude") { put("type", "number") }
+                        putJsonObject("longitude") { put("type", "number") }
+                    },
+                required = listOf("latitude", "longitude"),
+            ),
     ) { request ->
         val latitude = request.arguments["latitude"]?.jsonPrimitive?.doubleOrNull
         val longitude = request.arguments["longitude"]?.jsonPrimitive?.doubleOrNull
         if (latitude == null || longitude == null) {
             return@addTool CallToolResult(
-                content = listOf(TextContent("The 'latitude' and 'longitude' parameters are required.")),
+                content =
+                    listOf(
+                        TextContent(
+                            "The 'latitude' and 'longitude' parameters are required."
+                        )
+                    ),
             )
         }
 
@@ -127,22 +140,22 @@ fun runMcpServer() {
         CallToolResult(content = forecast.map { TextContent(it) })
     }
 
-//    server.addPrompt(Prompt("Test", "Test Prompt", listOf())) {
-//        GetPromptResult("Test Prompt Result", listOf(PromptMessage(Role.user, TextContent("d"))))
-//    }
+    //    server.addPrompt(Prompt("Test", "Test Prompt", listOf())) {
+    //        GetPromptResult("Test Prompt Result", listOf(PromptMessage(Role.user,
+    // TextContent("d"))))
+    //    }
 
     // Create a transport using standard IO for server communication
-    val transport = StdioServerTransport(
-        System.`in`.asInput(),
-        System.out.asSink().buffered(),
-    )
+    val transport =
+        StdioServerTransport(
+            System.`in`.asInput(),
+            System.out.asSink().buffered(),
+        )
 
     runBlocking {
         val session = server.connect(transport)
         val done = Job()
-        session.onClose {
-            done.complete()
-        }
+        session.onClose { done.complete() }
         done.join()
     }
 }

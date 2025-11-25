@@ -46,6 +46,7 @@ fun runMcpServer() {
                             ServerCapabilities.Tools(
                                 listChanged = true,
                             ),
+                        logging = null,
                     ),
             ),
         )

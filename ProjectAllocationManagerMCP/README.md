@@ -250,6 +250,78 @@ The server loads data from JSON files in the `data/` directory:
 - Date handling using java.time.LocalDate instead of DateTime
 - Gradle build system instead of .NET SDK
 
+## Debugging with MCP Inspector
+
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a visual testing tool that helps you debug and test your MCP server interactively.
+
+### Prerequisites
+
+- Node.js and npm installed
+- Your MCP server configured in `mcp_config.json`
+
+### Steps to Debug
+
+1. **Run the MCP Inspector with your server configuration:**
+
+   ```bash
+   npx @modelcontextprotocol/inspector --config <ABSOLUTE_PATH_TO_MCP_CONFIG> --server project-allocation-manager
+   ```
+
+   Replace `<ABSOLUTE_PATH_TO_MCP_CONFIG>` with the absolute path to your `mcp_config.json` file. For example:
+   ```bash
+   npx @modelcontextprotocol/inspector --config /Users/username/.codeium/windsurf/mcp_config.json --server project-allocation-manager
+   ```
+
+2. **Open the Inspector in your browser:**
+
+   After running the command, you'll see output with a URL and authentication token. Open your browser and navigate to:
+   ```
+   http://localhost:6274/?MCP_PROXY_AUTH_TOKEN=<YOUR_TOKEN>
+   ```
+
+   Replace `<YOUR_TOKEN>` with the token displayed in the terminal output.
+
+3. **Add Authentication Header:**
+
+   In the Inspector UI, add the authentication header:
+   - Header: `Authorization`
+   - Value: `Bearer <YOUR_TOKEN>`
+
+4. **Test Your Tools:**
+
+   You can now interactively test your MCP tools:
+   - View all available tools (list_engineers, list_projects, allocate_engineer, etc.)
+   - Test tool parameters and see their schemas
+   - Execute tools with custom parameters
+   - See real-time responses and validation errors
+   - Debug allocation logic and constraints
+
+### Example mcp_config.json Entry
+
+```json
+{
+  "mcpServers": {
+    "project-allocation-manager": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "/absolute/path/to/project-allocation-manager-mcp-0.1.0-all.jar"
+      ]
+    }
+  }
+}
+```
+
+### Testing Scenarios
+
+Use the Inspector to test various scenarios:
+
+- **Valid Allocation**: Allocate an engineer at 50% to a project
+- **Over-allocation**: Try to allocate an engineer beyond 100% capacity
+- **Date Overlap**: Test overlapping allocation periods
+- **Invalid Dates**: Test with invalid date formats or end dates before start dates
+- **Missing Resources**: Try to allocate non-existent engineers or projects
+
 ## License
 
 This is a demonstration project for MCP server implementation in Kotlin.

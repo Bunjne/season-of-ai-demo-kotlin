@@ -131,9 +131,75 @@ To integrate with Claude Desktop, add the following configuration to your Claude
 > [!NOTE]
 > Replace `/absolute/path/to/<your-jar-name>.jar` with the actual absolute path to your built jar file.
 
+## Debugging with MCP Inspector
+
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a visual testing tool that helps you debug and test your MCP server interactively.
+
+### Prerequisites
+
+- Node.js and npm installed
+- Your MCP server configured in `mcp_config.json`
+
+### Steps to Debug
+
+1. **Run the MCP Inspector with your server configuration:**
+
+   ```bash
+   npx @modelcontextprotocol/inspector --config <ABSOLUTE_PATH_TO_MCP_CONFIG> --server <server_name>
+   ```
+
+   Replace `<ABSOLUTE_PATH_TO_MCP_CONFIG>` with the absolute path to your `mcp_config.json` file. 
+   
+   Replace `<server_name>` with the name of your server. 
+   
+   For example:
+   ```bash
+   npx @modelcontextprotocol/inspector --config /Users/username/.codeium/windsurf/mcp_config.json --server weather
+   ```
+
+2. **Open the Inspector in your browser:**
+
+   After running the command, you'll see output with a URL and authentication token. Open your browser and navigate to:
+   ```
+   http://localhost:6274/?MCP_PROXY_AUTH_TOKEN=<YOUR_TOKEN>
+   ```
+
+   Replace `<YOUR_TOKEN>` with the token displayed in the terminal output.
+
+3. **Add Authentication Header:**
+
+   In the Inspector UI, add the authentication header:
+   - Header: `Authorization`
+   - Value: `Bearer <YOUR_TOKEN>`
+
+4. **Test Your Tools:**
+
+   You can now interactively test your MCP tools:
+   - View available tools and their schemas
+   - Execute tools with custom parameters
+   - See real-time responses and errors
+   - Debug tool behavior
+
+### Example mcp_config.json Entry
+
+```json
+{
+  "mcpServers": {
+    "weather": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "/absolute/path/to/weather-stdio-server-0.1.0-all.jar"
+      ]
+    }
+  }
+}
+```
+
 ## Additional Resources
 
 - [MCP Specification](https://spec.modelcontextprotocol.io/)
+- [MCP Inspector](https://github.com/modelcontextprotocol/inspector)
 - [Kotlin MCP SDK](https://github.com/modelcontextprotocol/kotlin-sdk)
 - [Ktor Client Documentation](https://ktor.io/docs/welcome.html)
 - [Kotlinx Serialization](https://kotlinlang.org/docs/serialization.html)
