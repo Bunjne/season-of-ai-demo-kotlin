@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.int
@@ -17,66 +16,67 @@ class AllocateEngineerTool(
     private val allocationService: AllocationService,
     private val json: Json,
 ) : McpTool {
-    override fun getToolDefinition(): Triple<String, String, Tool.Input> =
-        Triple(
-            "allocate_engineer",
-            "Allocate an engineer to a project with specified percentage and date range",
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        put(
-                            "engineerId",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "The unique identifier of the engineer to allocate",
-                                )
-                            },
-                        )
-                        put(
-                            "projectId",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "The unique identifier of the project to allocate to",
-                                )
-                            },
-                        )
-                        put(
-                            "allocationPercentage",
-                            buildJsonObject {
-                                put("type", "integer")
-                                put(
-                                    "description",
-                                    "Percentage of engineer's time to allocate (1-100)",
-                                )
-                            },
-                        )
-                        put(
-                            "startDate",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "Start date in YYYY-MM-DD format (optional, defaults to today)",
-                                )
-                            },
-                        )
-                        put(
-                            "endDate",
-                            buildJsonObject {
-                                put("type", "string")
-                                put(
-                                    "description",
-                                    "End date in YYYY-MM-DD format (optional, leave empty for indefinite)",
-                                )
-                            },
-                        )
-                    },
-                required = listOf("engineerId", "projectId", "allocationPercentage"),
-            ),
+    override fun getToolDefinition() =
+        ToolDefinition(
+            name = "allocate_engineer",
+            description = "Allocate an engineer to a project with specified percentage and date range",
+            inputSchema =
+                Tool.Input(
+                    properties =
+                        buildJsonObject {
+                            put(
+                                "engineerId",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "The unique identifier of the engineer to allocate",
+                                    )
+                                },
+                            )
+                            put(
+                                "projectId",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "The unique identifier of the project to allocate to",
+                                    )
+                                },
+                            )
+                            put(
+                                "allocationPercentage",
+                                buildJsonObject {
+                                    put("type", "integer")
+                                    put(
+                                        "description",
+                                        "Percentage of engineer's time to allocate (1-100)",
+                                    )
+                                },
+                            )
+                            put(
+                                "startDate",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "Start date in YYYY-MM-DD format (optional, defaults to today)",
+                                    )
+                                },
+                            )
+                            put(
+                                "endDate",
+                                buildJsonObject {
+                                    put("type", "string")
+                                    put(
+                                        "description",
+                                        "End date in YYYY-MM-DD format (optional, leave empty for indefinite)",
+                                    )
+                                },
+                            )
+                        },
+                    required = listOf("engineerId", "projectId", "allocationPercentage"),
+                ),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {
