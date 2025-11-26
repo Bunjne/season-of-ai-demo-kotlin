@@ -6,7 +6,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
 import java.time.LocalDate
 
 /**
@@ -21,10 +20,7 @@ class ListAllocationsTool(
             name = "list_allocations",
             description = "List all active allocations in the system (allocations that are currently ongoing)",
             inputSchema =
-                Tool.Input(
-                    properties = buildJsonObject {},
-                    required = emptyList(),
-                ),
+                Tool.Input(),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {

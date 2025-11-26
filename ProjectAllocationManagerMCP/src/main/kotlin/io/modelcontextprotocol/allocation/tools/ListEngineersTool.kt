@@ -6,7 +6,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
 
 class ListEngineersTool(
     private val allocationService: AllocationService,
@@ -16,11 +15,7 @@ class ListEngineersTool(
         ToolDefinition(
             name = "list_engineers",
             description = "List all engineers in the system with their details including ID, name, role, and skills.",
-            inputSchema =
-                Tool.Input(
-                    properties = buildJsonObject {},
-                    required = emptyList(),
-                ),
+            inputSchema = Tool.Input(),
         )
 
     override suspend fun execute(request: CallToolRequest): CallToolResult {

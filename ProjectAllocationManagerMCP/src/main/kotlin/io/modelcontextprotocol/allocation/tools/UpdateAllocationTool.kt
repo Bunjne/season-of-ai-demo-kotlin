@@ -5,7 +5,6 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -17,7 +16,6 @@ import kotlinx.serialization.json.put
  */
 class UpdateAllocationTool(
     private val allocationService: AllocationService,
-    private val json: Json,
 ) : McpTool {
     override fun getToolDefinition() =
         ToolDefinition(

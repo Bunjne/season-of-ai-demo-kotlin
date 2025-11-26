@@ -62,7 +62,7 @@ suspend fun runMcpServer() {
     val listProjectsTool = ListProjectsTool(allocationService, json)
     val listAllocationsTool = ListAllocationsTool(allocationService, json)
     val allocateEngineerTool = AllocateEngineerTool(allocationService, json)
-    val updateAllocationTool = UpdateAllocationTool(allocationService, json)
+    val updateAllocationTool = UpdateAllocationTool(allocationService)
     val getEngineerByIdTool = GetEngineerByIdTool(allocationService, json)
     val getProjectByIdTool = GetProjectByIdTool(allocationService, json)
     val getAllocationByIdTool = GetAllocationByIdTool(allocationService, json)
