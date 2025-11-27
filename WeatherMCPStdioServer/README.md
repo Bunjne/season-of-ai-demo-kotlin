@@ -1,8 +1,10 @@
-# Kotlin MCP Weather STDIO Server
+# Kotlin MCP Weather STDIO Server - Student Template
 
-This project demonstrates how to build a Model Context Protocol (MCP) server in Kotlin that provides weather-related
+This is a template project for building a Model Context Protocol (MCP) server in Kotlin that provides weather-related
 tools by consuming the National Weather Service (weather.gov) API. The server uses STDIO as the transport layer and
 leverages the Kotlin MCP SDK to expose weather forecast and alert tools.
+
+**This is a learning exercise.** You will need to implement the core functionality yourself by following the TODO comments in the code.
 
 For more information about the MCP SDK and protocol, please refer to
 the [MCP documentation](https://modelcontextprotocol.io/introduction).
@@ -12,20 +14,45 @@ the [MCP documentation](https://modelcontextprotocol.io/introduction).
 - Java 17 or later
 - Gradle (or the Gradle wrapper provided with the project)
 - Basic understanding of MCP concepts
-- Basic understanding of Kotlin and Kotlin ecosystems (sush as kotlinx-serialization, coroutines, ktor)
+- Basic understanding of Kotlin and Kotlin ecosystems (such as kotlinx-serialization, coroutines, ktor)
 
-## MCP Weather Server
+## Learning Objectives
 
-The project provides:
+By completing this project, you will learn how to:
 
-- A lightweight MCP server built with Kotlin.
-- STDIO transport layer implementation for server-client communication.
-- Two weather tools:
-    - **Weather Forecast Tool** — returns details such as temperature, wind information, and a detailed forecast for a
-      given latitude/longitude.
-    - **Weather Alerts Tool** — returns active weather alerts for a given US state.
+- Build an MCP server using the Kotlin MCP SDK
+- Implement STDIO transport for server-client communication
+- Create MCP tools with proper input schemas
+- Make HTTP requests using Ktor client
+- Parse JSON responses using kotlinx-serialization
+- Handle errors and validate parameters
 
-## Building and running
+## Your Task
+
+You need to implement two MCP tools by registering them in the server:
+
+- **Weather Forecast Tool (`get_forecast`)** — Should return details such as temperature, wind information, and a detailed forecast for a given latitude/longitude.
+- **Weather Alerts Tool (`get_alerts`)** — Should return active weather alerts for a given US state.
+
+## What's Provided
+
+**`WeatherApi.kt`** - ✅ Already implemented with HTTP client extension functions:
+- `HttpClient.getForecast(latitude, longitude)` - Fetches weather forecast data
+- `HttpClient.getAlerts(state)` - Fetches weather alerts data
+
+These functions are ready to use! You just need to register the MCP tools that call them.
+
+## What You Need to Implement
+
+**`McpWeatherServer.kt`** - Register the MCP tools:
+- Register `get_alerts` tool with proper input schema
+- Register `get_forecast` tool with proper input schema
+
+Look for `TODO` comments in `McpWeatherServer.kt` for detailed implementation instructions.
+
+## Building and Running
+
+The project will build successfully, but the tools won't be registered until you uncomment and complete the implementation.
 
 Use the Gradle wrapper to build the application. In a terminal run:
 
@@ -33,7 +60,7 @@ Use the Gradle wrapper to build the application. In a terminal run:
 ./gradlew clean build
 ```
 
-To run the server:
+To run the server (after implementation):
 
 ```shell
 java -jar build/libs/weather-stdio-server-0.1.0-all.jar
@@ -43,65 +70,71 @@ java -jar build/libs/weather-stdio-server-0.1.0-all.jar
 > The server uses STDIO transport, so it is typically launched in an environment where the client connects via standard
 > input/output.
 
-## Tool Implementation
+## Implementation Guide
 
-The project registers two MCP tools using the Kotlin MCP SDK. Below is an overview of the core tool implementations:
+### Implement Tool Registration in `McpWeatherServer.kt`
 
-### 1. Weather Forecast Tool
-
-This tool fetches the weather forecast for a specific latitude and longitude using the `weather.gov` API.
-
-Example tool registration in Kotlin:
-
-```kotlin
-server.addTool(
-    name = "get_forecast",
-    description = """
-            Get weather forecast for a specific latitude/longitude
-        """.trimIndent(),
-    inputSchema = Tool.Input(
-        properties = JsonObject(
-            mapOf(
-                "latitude" to JsonObject(mapOf("type" to JsonPrimitive("number"))),
-                "longitude" to JsonObject(mapOf("type" to JsonPrimitive("number"))),
-            )
-        ),
-        required = listOf("latitude", "longitude")
-    )
-) { request ->
-    // Implementation tool
-}
-```
-
-### 2. Weather Alerts Tool
-
-This tool retrieves active weather alerts for a US state.
-
-Example tool registration in Kotlin:
-
+#### `get_alerts` tool:
 ```kotlin
 server.addTool(
     name = "get_alerts",
-    description = """
-        Get weather alerts for a US state. Input is Two-letter US state code (e.g. CA, NY)
-    """.trimIndent(),
+    description = "Get weather alerts for a US state",
     inputSchema = Tool.Input(
-        properties = JsonObject(
-            mapOf(
-                "state" to JsonObject(
-                    mapOf(
-                        "type" to JsonPrimitive("string"),
-                        "description" to JsonPrimitive("Two-letter US state code (e.g. CA, NY)")
-                    )
-                ),
-            )
-        ),
+        properties = buildJsonObject {
+            putJsonObject("state") {
+                put("type", "string")
+                put("description", "Two-letter US state code (e.g. CA, NY)")
+            }
+        },
         required = listOf("state")
     )
 ) { request ->
-    // Implementation tool
+    // Extract state parameter
+    // Validate it's not null
+    // Call httpClient.getAlerts(state)
+    // Return CallToolResult with TextContent
 }
 ```
+
+#### `get_forecast` tool:
+```kotlin
+server.addTool(
+    // Implement tool registration
+) { request ->
+    // Extract latitude and longitude parameters
+    // Validate they are not null and are valid numbers
+    // Call httpClient.getForecast(latitude, longitude)
+    // Return CallToolResult with TextContent
+}
+```
+
+## API Reference
+
+### Weather.gov API Endpoints
+
+The National Weather Service API provides the following endpoints:
+
+1. **Points Endpoint**: `/points/{latitude},{longitude}`
+   - Returns metadata for a location, including the forecast URL
+   - Response includes a `properties.forecast` field with the forecast endpoint URL
+
+2. **Forecast Endpoint**: URL from points response
+   - Returns detailed weather forecast with multiple periods
+   - Each period includes temperature, wind, and forecast details
+
+3. **Alerts Endpoint**: `/alerts/active/area/{state}`
+   - Returns active weather alerts for a given state
+   - State should be a two-letter code (e.g., "CA", "NY")
+
+### Data Models
+
+The project includes pre-defined data classes for parsing API responses:
+
+- **`Points`** - Response from the points endpoint
+- **`Forecast`** - Response from the forecast endpoint with periods
+- **`Alert`** - Response from the alerts endpoint with features
+
+These are already defined in `WeatherApi.kt` and ready to use with kotlinx-serialization.
 
 ## Client Integration
 

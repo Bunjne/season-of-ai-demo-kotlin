@@ -72,78 +72,45 @@ fun runMcpServer() {
             ),
         )
 
-    // Register a tool to fetch weather alerts by state
-    server.addTool(
-        name = "get_alerts",
-        description =
-            """
-            Get weather alerts for a US state. Input is Two-letter US state code (e.g. CA, NY)
-        """.trimIndent(),
-        inputSchema =
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        putJsonObject("state") {
-                            put("type", "string")
-                            put(
-                                "description",
-                                "Two-letter US state code (e.g. CA, NY)"
-                            )
-                        }
-                    },
-                required = listOf("state"),
-            ),
-    ) { request ->
-        val state =
-            request.arguments["state"]?.jsonPrimitive?.content
-                ?: return@addTool CallToolResult(
-                    content = listOf(TextContent("The 'state' parameter is required.")),
-                )
+    /**
+     * TODO: Register a tool to fetch weather alerts by state
+     * 
+     * Tool name: "get_alerts"
+     * Description: "Get weather alerts for a US state"
+     * 
+     * Input schema should have:
+     * - Parameter "state" (type: string, required)
+     * - Description: "Two-letter US state code (e.g. CA, NY)"
+     * 
+     * Implementation should:
+     * 1. Extract the "state" parameter from request.arguments
+     * 2. Validate that the state parameter is provided
+     * 3. Call httpClient.getAlerts(state) to fetch alerts
+     * 4. Return CallToolResult with the alerts as TextContent
+     */
+    // server.addTool(...) { request ->
+    //     TODO("Implement get_alerts tool")
+    // }
 
-        val alerts = httpClient.getAlerts(state)
-
-        CallToolResult(content = alerts.map { TextContent(it) })
-    }
-
-    // Register a tool to fetch weather forecast by latitude and longitude
-    server.addTool(
-        name = "get_forecast",
-        description =
-            """
-            Get weather forecast for a specific latitude/longitude
-        """.trimIndent(),
-        inputSchema =
-            Tool.Input(
-                properties =
-                    buildJsonObject {
-                        putJsonObject("latitude") { put("type", "number") }
-                        putJsonObject("longitude") { put("type", "number") }
-                    },
-                required = listOf("latitude", "longitude"),
-            ),
-    ) { request ->
-        val latitude = request.arguments["latitude"]?.jsonPrimitive?.doubleOrNull
-        val longitude = request.arguments["longitude"]?.jsonPrimitive?.doubleOrNull
-        if (latitude == null || longitude == null) {
-            return@addTool CallToolResult(
-                content =
-                    listOf(
-                        TextContent(
-                            "The 'latitude' and 'longitude' parameters are required."
-                        )
-                    ),
-            )
-        }
-
-        val forecast = httpClient.getForecast(latitude, longitude)
-
-        CallToolResult(content = forecast.map { TextContent(it) })
-    }
-
-    //    server.addPrompt(Prompt("Test", "Test Prompt", listOf())) {
-    //        GetPromptResult("Test Prompt Result", listOf(PromptMessage(Role.user,
-    // TextContent("d"))))
-    //    }
+    /**
+     * TODO: Register a tool to fetch weather forecast by latitude and longitude
+     * 
+     * Tool name: "get_forecast"
+     * Description: "Get weather forecast for a location"
+     * 
+     * Input schema should have:
+     * - Parameter "latitude" (type: number, required)
+     * - Parameter "longitude" (type: number, required)
+     * 
+     * Implementation should:
+     * 1. Extract the "latitude" and "longitude" parameters from request.arguments
+     * 2. Validate that both parameters are provided and are valid numbers
+     * 3. Call httpClient.getForecast(latitude, longitude) to fetch forecast
+     * 4. Return CallToolResult with the forecast as TextContent
+     */
+    // server.addTool(...) { request ->
+    //     TODO("Implement get_forecast tool")
+    // }
 
     // Create a transport using standard IO for server communication
     val transport =
